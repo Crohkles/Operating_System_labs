@@ -1,0 +1,6 @@
+*.docx
+*.zip
+test/
+__pycache__
+build
+simulator.spec
