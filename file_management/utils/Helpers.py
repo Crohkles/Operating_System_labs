@@ -171,8 +171,7 @@ class FileSystem:
         """格式化文件系统"""
         self.disk = Disk(self.block_count, self.block_size)
         self.fat = FAT(self.block_count)
-        self.bitmap = FreeSpaceBitmap(self.block_count)
-        
+        self.bitmap = FreeSpaceBitmap(self.block_count)        
         root_fcb = FCB("/", 0, -1, is_directory=True)
         self.root = FileNode(root_fcb)
         self.current_dir = self.root
@@ -181,7 +180,11 @@ class FileSystem:
         print("文件系统格式化完成")
     
     def create_directory(self, name):
-        """创建子目录"""
+        """创建子目录 - 现在支持路径"""
+        # 检查是否包含路径分隔符，如果有则使用路径解析
+        if "/" in name:
+            return self.create_directory_with_path(name)
+          # 原有逻辑：在当前目录下创建
         if self.current_dir.find_child(name):
             return False, f"目录 '{name}' 已存在"
         
@@ -190,8 +193,20 @@ class FileSystem:
         self.current_dir.add_child(dir_node)
         return True, f"目录 '{name}' 创建成功"
     
-    def delete_directory(self, name):
-        """删除子目录"""
+    def delete_directory(self, name, recursive=False, force=False, confirm_callback=None):
+        """删除子目录 - 现在支持路径和递归删除
+        
+        Args:
+            name: 目录名或路径
+            recursive: 是否递归删除
+            force: 是否强制删除（跳过确认）
+            confirm_callback: 确认回调函数
+        """
+        # 检查是否包含路径分隔符，如果有则使用路径解析
+        if "/" in name:
+            return self.delete_directory_with_path(name, recursive, force, confirm_callback)
+        
+        # 原有逻辑：在当前目录下删除
         child = self.current_dir.find_child(name)
         if not child:
             return False, f"目录 '{name}' 不存在"
@@ -200,7 +215,17 @@ class FileSystem:
             return False, f"'{name}' 不是目录"
         
         if child.children:
-            return False, f"目录 '{name}' 不为空，无法删除"
+            if recursive:
+                # 使用递归删除
+                return self.delete_directory_recursive(name, force, confirm_callback)
+            else:
+                # 非递归模式，提供递归删除建议
+                dir_info = self._get_directory_info(child, name)
+                return False, {
+                    'type': 'suggest_recursive',
+                    'info': dir_info,
+                    'message': f"目录 '{name}' 不为空，包含 {dir_info['total_files']} 个文件和 {dir_info['total_dirs']} 个子目录。使用 recursive=True 进行递归删除。"
+                }
         
         self.current_dir.remove_child(name)
         return True, f"目录 '{name}' 删除成功"
@@ -216,43 +241,44 @@ class FileSystem:
                 'type': item_type,
                 'size': fcb.size,
                 'created': fcb.creation_time.strftime("%Y-%m-%d %H:%M:%S"),
-                'modified': fcb.last_modification_time.strftime("%Y-%m-%d %H:%M:%S")
-            })
+                'modified': fcb.last_modification_time.strftime("%Y-%m-%d %H:%M:%S")            })
         return items
     
     def change_directory(self, path):
-        """更改当前目录"""
-        if path == "..":
-            if self.current_dir.parent:
-                self.current_dir = self.current_dir.parent
-                self.current_path.pop()
-                return True, f"切换到上级目录"
-            else:
-                return False, "已在根目录"
+        """更改当前目录 - 支持绝对路径和相对路径"""
+        # 使用新的路径解析功能
+        target_node, success, msg = self._resolve_path(path)
         
-        if path.startswith("/"):
-            # 绝对路径
-            self.current_dir = self.root
+        if not success:
+            return False, msg
+        
+        if not target_node.fcb.is_directory:
+            return False, f"'{path}' 不是目录"
+        
+        # 更新当前目录
+        self.current_dir = target_node
+        
+        # 重建当前路径
+        new_path = []
+        current = target_node
+        while current and current != self.root:
+            new_path.insert(0, current.fcb.name)
+            current = current.parent
+        
+        if not new_path:
             self.current_path = ["/"]
-            if path == "/":
-                return True, "切换到根目录"
-            path = path[1:]  # 移除开头的/
+        else:            self.current_path = ["/"] + new_path
         
-        # 相对路径
-        parts = path.split("/")
-        for part in parts:
-            if not part:
-                continue
-            child = self.current_dir.find_child(part)
-            if not child or not child.fcb.is_directory:
-                return False, f"目录 '{part}' 不存在"
-            self.current_dir = child
-            self.current_path.append(part)
-        
-        return True, f"切换到目录: {'/' if len(self.current_path) == 1 else '/'.join(self.current_path[1:])}"
+        current_path_str = self.get_current_path()
+        return True, f"切换到目录: {current_path_str}"
     
     def create_file(self, name, content=""):
-        """创建文件"""
+        """创建文件 - 现在支持路径"""
+        # 检查是否包含路径分隔符，如果有则使用路径解析
+        if "/" in name:
+            return self.create_file_with_path(name, content)
+        
+        # 原有逻辑：在当前目录下创建
         if self.current_dir.find_child(name):
             return False, f"文件 '{name}' 已存在"
         
@@ -277,7 +303,12 @@ class FileSystem:
         return True, f"文件 '{name}' 创建成功"
     
     def delete_file(self, name):
-        """删除文件"""
+        """删除文件 - 现在支持路径"""
+        # 检查是否包含路径分隔符，如果有则使用路径解析
+        if "/" in name:
+            return self.delete_file_with_path(name)
+        
+        # 原有逻辑：在当前目录下删除
         child = self.current_dir.find_child(name)
         if not child:
             return False, f"文件 '{name}' 不存在"
@@ -508,3 +539,402 @@ class FileSystem:
             return True, f"文件系统已从 {filename} 加载"
         except Exception as e:
             return False, f"加载失败: {str(e)}"
+    
+    def _normalize_path(self, path):
+        """标准化路径，处理 . 和 .. 以及多个连续的 /"""
+        if not path:
+            return ""
+        
+        # 将路径分割成组件
+        if path.startswith("/"):
+            is_absolute = True
+            components = path[1:].split("/") if path != "/" else []
+        else:
+            is_absolute = False
+            components = path.split("/")
+        
+        # 处理 . 和 .. 
+        normalized = []
+        for component in components:
+            if component == "" or component == ".":
+                continue  # 忽略空组件和当前目录
+            elif component == "..":
+                if normalized:
+                    normalized.pop()  # 返回上级目录
+            else:
+                normalized.append(component)
+        
+        # 重建路径
+        if is_absolute:            
+            return "/" + "/".join(normalized) if normalized else "/"
+        else:
+            return "/".join(normalized)
+    
+    def _resolve_path(self, path):
+        """解析路径，返回目标节点和路径信息"""
+        # 对于相对路径，需要从当前路径开始计算
+        if not path.startswith("/"):
+            # 相对路径：基于当前路径构建完整路径
+            current_path_str = "/".join(self.current_path[1:]) if len(self.current_path) > 1 else ""
+            if current_path_str:
+                full_path = "/" + current_path_str + "/" + path
+            else:
+                full_path = "/" + path
+            normalized_path = self._normalize_path(full_path)
+        else:
+            # 绝对路径
+            normalized_path = self._normalize_path(path)
+        
+        if not normalized_path:
+            return self.current_dir, True, "当前目录"
+        
+        # 现在处理绝对路径
+        if normalized_path == "/":
+            return self.root, True, "根目录"
+            
+        # 从根开始查找
+        current_node = self.root
+        path_parts = normalized_path[1:].split("/")
+        
+        # 逐层查找
+        for i, part in enumerate(path_parts):
+            if not part:
+                continue
+            
+            child = current_node.find_child(part)
+            if not child:
+                remaining_path = "/".join(path_parts[i:])
+                return None, False, f"路径 '{remaining_path}' 不存在"
+            
+            current_node = child
+        
+        return current_node, True, f"路径解析成功"
+    
+    def _get_parent_directory_and_name(self, path):
+        """从路径中分离出父目录和文件/目录名"""
+        normalized_path = self._normalize_path(path)
+        
+        if not normalized_path or normalized_path == "/":
+            return self.root, "/"
+        
+        if "/" not in normalized_path:
+            # 当前目录下的文件/目录
+            return self.current_dir, normalized_path
+        
+        # 分离路径和名称
+        if normalized_path.startswith("/"):
+            # 绝对路径
+            parts = normalized_path[1:].split("/")
+            if len(parts) == 1:
+                return self.root, parts[0]
+            
+            parent_path = "/" + "/".join(parts[:-1])
+            name = parts[-1]
+        else:
+            # 相对路径
+            parts = normalized_path.split("/")
+            if len(parts) == 1:
+                return self.current_dir, parts[0]
+            
+            parent_path = "/".join(parts[:-1])
+            name = parts[-1]
+        
+        parent_node, success, msg = self._resolve_path(parent_path)
+        if not success:
+            return None, None
+        
+        if not parent_node.fcb.is_directory:
+            return None, None
+        
+        return parent_node, name
+
+    def create_file_with_path(self, path, content=""):
+        """支持路径的文件创建"""
+        parent_node, filename = self._get_parent_directory_and_name(path)
+        
+        if parent_node is None:
+            return False, f"路径 '{path}' 无效"
+        
+        if not parent_node.fcb.is_directory:
+            return False, f"父路径不是目录"
+        
+        # 检查文件是否已存在
+        if parent_node.find_child(filename):
+            return False, f"文件 '{filename}' 已存在"
+        
+        # 分配磁盘块
+        start_block = self.fat.allocate_blocks(len(content), self.block_size)
+        if start_block is None:
+            return False, "磁盘空间不足"
+        
+        # 写入内容到磁盘块
+        if content:
+            self._write_to_blocks(start_block, content)
+            # 更新位图
+            blocks = self.fat.get_file_blocks(start_block)
+            for block in blocks:
+                self.bitmap.allocate_block(block)
+        
+        # 创建FCB和文件节点
+        file_fcb = FCB(filename, len(content), start_block if content else -1, is_directory=False)
+        file_node = FileNode(file_fcb)
+        parent_node.add_child(file_node)
+        
+        return True, f"文件 '{path}' 创建成功"
+    
+    def delete_file_with_path(self, path):
+        """支持路径的文件删除"""
+        parent_node, filename = self._get_parent_directory_and_name(path)
+        
+        if parent_node is None:
+            return False, f"路径 '{path}' 无效"
+        
+        child = parent_node.find_child(filename)
+        if not child:
+            return False, f"文件 '{path}' 不存在"
+        
+        if child.fcb.is_directory:
+            return False, f"'{path}' 是目录，请使用删除目录命令"
+        
+        # 释放磁盘块
+        if child.fcb.start_block != -1:
+            blocks = self.fat.get_file_blocks(child.fcb.start_block)
+            for block in blocks:
+                self.bitmap.free_block(block)
+            self.fat.free_blocks(child.fcb.start_block)
+        
+        # 关闭打开的文件
+        for file_id, file_info in list(self.open_files.items()):
+            if file_info['node'] == child:
+                del self.open_files[file_id]
+        
+        parent_node.remove_child(filename)
+        return True, f"文件 '{path}' 删除成功"
+    
+    def open_file_with_path(self, path, mode="r"):
+        """支持路径的文件打开"""
+        parent_node, filename = self._get_parent_directory_and_name(path)
+        
+        if parent_node is None:
+            return None, f"路径 '{path}' 无效"
+        
+        child = parent_node.find_child(filename)
+        if not child:
+            return None, f"文件 '{path}' 不存在"
+        
+        if child.fcb.is_directory:
+            return None, f"'{path}' 是目录，无法打开"
+        
+        if mode not in ["r", "w", "rw"]:
+            return None, "无效的文件模式"
+        
+        file_id = self.next_file_id
+        self.next_file_id += 1
+        
+        self.open_files[file_id] = {
+            'node': child,
+            'mode': mode,
+            'position': 0        }
+        
+        child.fcb.last_access_time = datetime.now()
+        return file_id, f"文件 '{path}' 打开成功"
+    
+    def create_directory_with_path(self, path):
+        """支持路径的目录创建"""
+        parent_node, dirname = self._get_parent_directory_and_name(path)
+        
+        if parent_node is None:
+            return False, f"路径 '{path}' 无效"
+        
+        if not parent_node.fcb.is_directory:
+            return False, f"父路径不是目录"
+        
+        if parent_node.find_child(dirname):
+            return False, f"目录 '{dirname}' 已存在"
+        
+        dir_fcb = FCB(dirname, 0, -1, is_directory=True)
+        dir_node = FileNode(dir_fcb)
+        parent_node.add_child(dir_node)
+        return True, f"目录 '{path}' 创建成功"
+    
+    def delete_directory_with_path(self, path, recursive=False, force=False, confirm_callback=None):
+        """支持路径的目录删除 - 现在支持递归删除"""
+        parent_node, dirname = self._get_parent_directory_and_name(path)
+        
+        if parent_node is None:
+            return False, f"路径 '{path}' 无效"
+        
+        child = parent_node.find_child(dirname)
+        if not child:
+            return False, f"目录 '{path}' 不存在"
+        
+        if not child.fcb.is_directory:
+            return False, f"'{path}' 不是目录"
+        
+        if child.children:
+            if recursive:
+                # 使用递归删除
+                return self.delete_directory_recursive(path, force, confirm_callback)
+            else:
+                # 非递归模式，提供递归删除建议
+                dir_info = self._get_directory_info(child, path)
+                return False, {
+                    'type': 'suggest_recursive',
+                    'info': dir_info,
+                    'message': f"目录 '{path}' 不为空，包含 {dir_info['total_files']} 个文件和 {dir_info['total_dirs']} 个子目录。使用 recursive=True 进行递归删除。"
+                }
+        
+        parent_node.remove_child(dirname)
+        return True, f"目录 '{path}' 删除成功"
+    
+    def list_directory_with_path(self, path=None):
+        """支持路径的目录列表"""
+        if path is None:
+            # 使用当前目录
+            target_node = self.current_dir
+        else:
+            target_node, success, msg = self._resolve_path(path)
+            if not success:
+                return None, msg
+            
+            if not target_node.fcb.is_directory:
+                return None, f"'{path}' 不是目录"
+        
+        items = []
+        for child in target_node.children:
+            fcb = child.fcb
+            item_type = "目录" if fcb.is_directory else "文件"
+            items.append({
+                'name': fcb.name,
+                'type': item_type,
+                'size': fcb.size,
+                'created': fcb.creation_time.strftime("%Y-%m-%d %H:%M:%S"),
+                'modified': fcb.last_modification_time.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        return items, "列表获取成功"
+    
+    def _get_directory_info(self, node, path=""):
+        """获取目录信息，用于递归删除前的确认显示"""
+        if not node.fcb.is_directory:
+            return None
+        
+        info = {
+            'path': path,
+            'total_files': 0,
+            'total_dirs': 0,
+            'total_size': 0,
+            'items': []
+        }
+        
+        def count_recursive(current_node, current_path):
+            for child in current_node.children:
+                child_path = current_path + "/" + child.fcb.name if current_path else child.fcb.name
+                
+                if child.fcb.is_directory:
+                    info['total_dirs'] += 1
+                    info['items'].append(f"目录: {child_path}")
+                    count_recursive(child, child_path)
+                else:
+                    info['total_files'] += 1
+                    info['total_size'] += child.fcb.size
+                    info['items'].append(f"文件: {child_path} ({child.fcb.size} bytes)")
+        
+        count_recursive(node, "")
+        return info
+    
+    def _recursive_delete_directory(self, node):
+        """内部递归删除目录的实现"""
+        if not node.fcb.is_directory:
+            return False, "不是目录"
+        
+        deleted_files = 0
+        deleted_dirs = 0
+        
+        # 递归删除所有子项
+        for child in list(node.children):  # 使用 list() 创建副本避免迭代时修改
+            if child.fcb.is_directory:
+                # 递归删除子目录
+                success, msg = self._recursive_delete_directory(child)
+                if success:
+                    deleted_dirs += 1
+                else:
+                    return False, f"删除子目录 {child.fcb.name} 失败: {msg}"
+            else:
+                # 删除文件
+                if child.fcb.start_block != -1:
+                    blocks = self.fat.get_file_blocks(child.fcb.start_block)
+                    for block in blocks:
+                        self.bitmap.free_block(block)
+                    self.fat.free_blocks(child.fcb.start_block)
+                
+                # 关闭打开的文件
+                for file_id, file_info in list(self.open_files.items()):
+                    if file_info['node'] == child:
+                        del self.open_files[file_id]
+                
+                deleted_files += 1
+            
+            # 从父目录移除
+            node.remove_child(child.fcb.name)
+        
+        return True, f"已删除 {deleted_files} 个文件和 {deleted_dirs} 个目录"
+    
+    def delete_directory_recursive(self, name, force=False, confirm_callback=None):
+        """递归删除目录及其所有内容
+        
+        Args:
+            name: 目录名或路径
+            force: 是否强制删除（跳过确认）
+            confirm_callback: 确认回调函数，接收目录信息，返回 True/False
+        
+        Returns:
+            (success, message)
+        """
+        # 解析目标目录
+        if "/" in name:
+            parent_node, dirname = self._get_parent_directory_and_name(name)
+            if parent_node is None:
+                return False, f"路径 '{name}' 无效"
+            target = parent_node.find_child(dirname)
+            target_path = name
+        else:
+            target = self.current_dir.find_child(name)
+            target_path = name
+            parent_node = self.current_dir
+        
+        if not target:
+            return False, f"目录 '{name}' 不存在"
+        
+        if not target.fcb.is_directory:
+            return False, f"'{name}' 不是目录"
+        
+        # 如果目录为空，直接删除
+        if not target.children:
+            parent_node.remove_child(target.fcb.name)
+            return True, f"空目录 '{name}' 删除成功"
+        
+        # 获取目录信息
+        dir_info = self._get_directory_info(target, target_path)
+        
+        if not force:
+            # 需要用户确认
+            if confirm_callback:
+                # 使用回调函数确认
+                if not confirm_callback(dir_info):
+                    return False, "用户取消删除操作"
+            else:
+                # 返回需要确认的信息
+                return False, {
+                    'type': 'confirmation_needed',
+                    'info': dir_info,
+                    'message': f"目录 '{name}' 不为空，包含 {dir_info['total_files']} 个文件和 {dir_info['total_dirs']} 个子目录"
+                }
+        
+        # 执行递归删除
+        success, msg = self._recursive_delete_directory(target)
+        if success:
+            # 删除目录本身
+            parent_node.remove_child(target.fcb.name)
+            return True, f"目录 '{name}' 及其内容递归删除成功: {msg}"
+        else:
+            return False, f"递归删除失败: {msg}"
