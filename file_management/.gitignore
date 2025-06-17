@@ -4,3 +4,4 @@ test
 *.docx
 *.spec
 build
+*.zip
