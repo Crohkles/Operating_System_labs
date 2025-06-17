@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-文件系统图形用户界面
-基于PyQt5的文件资源管理器
-"""
-
 import sys
 import os
 from PyQt5.QtWidgets import *
