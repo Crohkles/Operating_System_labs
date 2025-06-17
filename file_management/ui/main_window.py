@@ -437,20 +437,25 @@ class FileSystemGUI(QMainWindow):
             QMessageBox.warning(self, "错误", str(result))
             
     def delete_file(self, name):
-        """删除文件"""
+        """删除文件"""        
         success, msg = self.fs.delete_file(name)
         if success:
             self.status_bar.showMessage(msg)
         else:
             QMessageBox.warning(self, "错误", msg)
-            
+    
     def open_file(self, name):
         """打开文件"""
         # 检查文件是否已经打开
         if name in self.open_files:
-            self.open_files[name].raise_()
-            self.open_files[name].activateWindow()
-            return
+            # 检查窗口是否仍然有效
+            if self.open_files[name].isVisible():
+                self.open_files[name].raise_()
+                self.open_files[name].activateWindow()
+                return
+            else:
+                # 窗口已关闭但引用仍存在，清理引用
+                del self.open_files[name]
             
         # 打开文件
         file_id, msg = self.fs.open_file(name, "rw")
@@ -468,11 +473,17 @@ class FileSystemGUI(QMainWindow):
         # 创建文件编辑窗口
         editor = FileEditor(name, content, file_id, self.fs, self)
         editor.file_saved.connect(self.refresh_file_list)
+        
+        # 连接关闭事件，确保正确清理引用
+        def cleanup_editor():
+            if name in self.open_files:
+                del self.open_files[name]
+        
+        editor.editor_closed.connect(cleanup_editor)
         editor.show()
         
         # 保存引用
         self.open_files[name] = editor
-        editor.finished.connect(lambda: self.open_files.pop(name, None))
         
     def show_tree_context_menu(self, position):
         """显示目录树右键菜单"""
@@ -633,6 +644,7 @@ class FileEditor(QDialog):
     """文件编辑器"""
     
     file_saved = pyqtSignal()
+    editor_closed = pyqtSignal()  # 新增：编辑器关闭信号
     
     def __init__(self, filename, content, file_id, filesystem, parent=None):
         super().__init__(parent)
@@ -699,23 +711,33 @@ class FileEditor(QDialog):
             
     def closeEvent(self, event):
         """关闭事件"""
-        if self.text_edit.toPlainText() != self.original_content:
-            reply = QMessageBox.question(self, '保存更改', 
-                                       f'文件 "{self.filename}" 已修改，是否保存更改？',
-                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                                       QMessageBox.Save)
-            
-            if reply == QMessageBox.Save:
-                self.save_file()
-                self.fs.close_file(self.file_id)
-                event.accept()
-            elif reply == QMessageBox.Discard:
-                self.fs.close_file(self.file_id)
-                event.accept()
+        try:
+            if self.text_edit.toPlainText() != self.original_content:
+                reply = QMessageBox.question(self, '保存更改', 
+                                           f'文件 "{self.filename}" 已修改，是否保存更改？',
+                                           QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                                           QMessageBox.Save)
+                
+                if reply == QMessageBox.Save:
+                    self.save_file()
+                    self.fs.close_file(self.file_id)
+                    self.editor_closed.emit()  # 发出关闭信号
+                    event.accept()
+                elif reply == QMessageBox.Discard:
+                    self.fs.close_file(self.file_id)
+                    self.editor_closed.emit()  # 发出关闭信号
+                    event.accept()
+                else:
+                    event.ignore()
+                    return
             else:
-                event.ignore()
-        else:
-            self.fs.close_file(self.file_id)
+                self.fs.close_file(self.file_id)
+                self.editor_closed.emit()  # 发出关闭信号
+                event.accept()
+        except Exception as e:
+            # 如果出现任何异常，仍然要确保发出关闭信号
+            print(f"关闭文件编辑器时出现错误: {e}")
+            self.editor_closed.emit()
             event.accept()
 
 

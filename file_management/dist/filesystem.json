@@ -3047,7 +3047,7 @@
                   "start_block": 0,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T13:19:45.025104",
+                  "last_access_time": "2025-06-17T13:59:49.151887",
                   "last_modification_time": "2025-06-15T19:26:59.164256"
                 },
                 "children": []
@@ -3059,7 +3059,7 @@
                   "start_block": 1,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
+                  "last_access_time": "2025-06-17T13:56:03.222501",
                   "last_modification_time": "2025-06-15T18:59:27.723072"
                 },
                 "children": []
@@ -3219,7 +3219,7 @@
                   "start_block": 9,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T14:02:09.653372",
+                  "last_access_time": "2025-06-15T18:59:27.723072",
                   "last_modification_time": "2025-06-15T18:59:27.723072"
                 },
                 "children": []
@@ -3231,7 +3231,7 @@
                   "start_block": 10,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T14:02:07.871617",
+                  "last_access_time": "2025-06-15T19:02:52.067502",
                   "last_modification_time": "2025-06-15T18:59:27.723072"
                 },
                 "children": []
@@ -3293,7 +3293,7 @@
                   "start_block": 13,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
+                  "last_access_time": "2025-06-17T13:55:49.660960",
                   "last_modification_time": "2025-06-15T18:59:27.723072"
                 },
                 "children": []
@@ -3305,12 +3305,24 @@
                   "start_block": 14,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
+                  "last_access_time": "2025-06-17T13:55:45.763541",
+                  "last_modification_time": "2025-06-17T13:55:46.903491"
                 },
                 "children": []
               }
             ]
+          },
+          {
+            "fcb": {
+              "name": "a.txt",
+              "size": 0,
+              "start_block": -1,
+              "is_directory": false,
+              "creation_time": "2025-06-17T13:54:23.822799",
+              "last_access_time": "2025-06-17T13:55:36.655942",
+              "last_modification_time": "2025-06-17T13:54:23.822799"
+            },
+            "children": []
           }
         ]
       },
@@ -3422,13 +3434,25 @@
           "last_modification_time": "2025-06-15T19:10:38.045811"
         },
         "children": []
+      },
+      {
+        "fcb": {
+          "name": ".viminfo",
+          "size": 0,
+          "start_block": -1,
+          "is_directory": false,
+          "creation_time": "2025-06-17T13:54:40.994678",
+          "last_access_time": "2025-06-17T13:55:24.943165",
+          "last_modification_time": "2025-06-17T13:54:40.994678"
+        },
+        "children": []
       }
     ]
   },
   "current_path": [
     "/",
     "MyProject",
-    "docs"
+    "src"
   ],
-  "next_file_id": 13
+  "next_file_id": 17
 }
