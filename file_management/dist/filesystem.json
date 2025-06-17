@@ -17,7 +17,7 @@
     -2,
     -2,
     -2,
-    -1,
+    -2,
     -1,
     -1,
     -1,
@@ -1019,7 +1019,7 @@
     1,
     1,
     1,
-    0,
+    1,
     0,
     0,
     0,
@@ -2013,7 +2013,7 @@
     "# 数据库模块",
     "# 字符串工具",
     "# 日期工具",
-    "# 主程序测试\n23431\n4214\n\n42142\n4\n1242\n1\n\n214\n1\n2424\n1\n42\n412414\n\n\n21\n4\n21\n41\n4\n214\n14\n1\n4\n1\n2\n",
+    "# 主程序测试\n23431\n4214\n\n42142\n4\n1242\n1\n\n214\n1\n2424\n1\n42\n412414\n\n\n21\n4\n21\n41\n4\n214\n14\n1\n4\n1\n2\n\n\naggar1vcf21v2q\ncwrxqd\n vaevw\n",
     "# 工具测试\n#\n#",
     "# 项目说明",
     "# API文档",
@@ -2021,7 +2021,7 @@
     "fake_screenshot_data",
     "{\"debug\": true}",
     "{\"debug\": false}",
-    "我是一个孤独的文件",
+    "deafeeaefea",
     "",
     "",
     "",
@@ -3178,12 +3178,12 @@
               {
                 "fcb": {
                   "name": "test_main.py",
-                  "size": 89,
+                  "size": 120,
                   "start_block": 7,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T19:01:55.625201",
-                  "last_modification_time": "2025-06-15T19:02:05.929112"
+                  "last_access_time": "2025-06-17T14:58:41.148670",
+                  "last_modification_time": "2025-06-17T14:58:48.386011"
                 },
                 "children": []
               },
@@ -3194,7 +3194,7 @@
                   "start_block": 8,
                   "is_directory": false,
                   "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T19:10:45.775799",
+                  "last_access_time": "2025-06-17T14:58:53.721959",
                   "last_modification_time": "2025-06-15T19:10:54.386764"
                 },
                 "children": []
@@ -3352,12 +3352,12 @@
           {
             "fcb": {
               "name": ".rc",
-              "size": 0,
-              "start_block": -1,
+              "size": 11,
+              "start_block": 15,
               "is_directory": false,
               "creation_time": "2025-06-15T19:16:33.592248",
-              "last_access_time": "2025-06-15T19:16:33.592248",
-              "last_modification_time": "2025-06-15T19:16:33.592248"
+              "last_access_time": "2025-06-17T14:58:34.478447",
+              "last_modification_time": "2025-06-17T14:58:36.964814"
             },
             "children": []
           }
@@ -3450,9 +3450,7 @@
     ]
   },
   "current_path": [
-    "/",
-    "MyProject",
-    "src"
+    "/"
   ],
-  "next_file_id": 17
+  "next_file_id": 20
 }

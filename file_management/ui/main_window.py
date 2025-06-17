@@ -11,6 +11,120 @@ from utils.Helpers import FileSystem
 from utils.constants import SAVE_FILE
 
 
+class PropertiesDialog(QDialog):
+    """文件/目录属性对话框"""
+    
+    def __init__(self, properties, parent=None):
+        super().__init__(parent)
+        self.properties = properties
+        self.init_ui()
+        
+    def init_ui(self):
+        """初始化属性对话框界面"""
+        self.setWindowTitle(f"{self.properties['name']} - 属性")
+        self.setFixedSize(400, 500)
+        self.setWindowIcon(self.style().standardIcon(QStyle.SP_FileDialogDetailedView))
+        
+        layout = QVBoxLayout(self)
+        
+        # 标题区域
+        title_layout = QHBoxLayout()
+        
+        # 图标
+        icon_label = QLabel()
+        if self.properties['type'] == "目录":
+            icon = self.style().standardIcon(QStyle.SP_DirIcon)
+        else:
+            icon = self.style().standardIcon(QStyle.SP_FileIcon)
+        icon_label.setPixmap(icon.pixmap(32, 32))
+        title_layout.addWidget(icon_label)
+        
+        # 名称
+        name_label = QLabel(self.properties['name'])
+        name_label.setFont(QFont("Arial", 12, QFont.Bold))
+        title_layout.addWidget(name_label)
+        title_layout.addStretch()
+        
+        layout.addLayout(title_layout)
+        layout.addWidget(self.create_separator())
+        
+        # 属性表格
+        self.create_properties_table(layout)
+        
+        # 按钮区域
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        
+        ok_button = QPushButton("确定")
+        ok_button.clicked.connect(self.accept)
+        ok_button.setDefault(True)
+        button_layout.addWidget(ok_button)
+        
+        layout.addLayout(button_layout)
+        
+    def create_separator(self):
+        """创建分隔线"""
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setFrameShadow(QFrame.Sunken)
+        return line
+        
+    def create_properties_table(self, layout):
+        """创建属性表格"""
+        # 基本信息组
+        basic_group = QGroupBox("基本信息")
+        basic_layout = QFormLayout(basic_group)
+        
+        basic_layout.addRow("名称:", QLabel(self.properties['name']))
+        basic_layout.addRow("类型:", QLabel(self.properties['type']))
+        basic_layout.addRow("位置:", QLabel(self.properties['path']))
+        
+        layout.addWidget(basic_group)
+        
+        # 大小信息组
+        size_group = QGroupBox("大小信息")
+        size_layout = QFormLayout(size_group)
+        
+        if self.properties['type'] == "目录":
+            size_layout.addRow("包含项目:", QLabel(f"{self.properties['total_items']} 项"))
+            size_layout.addRow("文件数:", QLabel(str(self.properties['file_count'])))
+            size_layout.addRow("文件夹数:", QLabel(str(self.properties['dir_count'])))
+            size_layout.addRow("内容大小:", QLabel(f"{self.properties['total_content_size_formatted']} ({self.properties['total_content_size']} 字节)"))
+        else:
+            size_layout.addRow("大小:", QLabel(f"{self.properties['size_formatted']} ({self.properties['size']} 字节)"))
+            if 'allocated_size_formatted' in self.properties:
+                size_layout.addRow("分配大小:", QLabel(f"{self.properties['allocated_size_formatted']} ({self.properties['allocated_size']} 字节)"))
+                size_layout.addRow("占用块数:", QLabel(str(self.properties['blocks_used'])))
+                if self.properties['blocks_used'] > 0:
+                    blocks_text = ", ".join(map(str, self.properties['block_list'][:10]))
+                    if len(self.properties['block_list']) > 10:
+                        blocks_text += f"... (共{len(self.properties['block_list'])}块)"
+                    size_layout.addRow("存储块:", QLabel(blocks_text))
+        
+        layout.addWidget(size_group)
+        
+        # 时间信息组
+        time_group = QGroupBox("时间信息")
+        time_layout = QFormLayout(time_group)
+        
+        time_layout.addRow("创建时间:", QLabel(self.properties['creation_time']))
+        time_layout.addRow("修改时间:", QLabel(self.properties['last_modification_time']))
+        time_layout.addRow("访问时间:", QLabel(self.properties['last_access_time']))
+        
+        layout.addWidget(time_group)
+        
+        # 技术信息组
+        tech_group = QGroupBox("技术信息")
+        tech_layout = QFormLayout(tech_group)
+        
+        if self.properties['start_block'] != -1:
+            tech_layout.addRow("起始块:", QLabel(str(self.properties['start_block'])))
+        else:
+            tech_layout.addRow("起始块:", QLabel("无（空文件）"))
+        
+        layout.addWidget(tech_group)
+        
+
 class FileSystemGUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -477,8 +591,7 @@ class FileSystemGUI(QMainWindow):
         # 连接关闭事件，确保正确清理引用
         def cleanup_editor():
             if name in self.open_files:
-                del self.open_files[name]
-        
+                del self.open_files[name]        
         editor.editor_closed.connect(cleanup_editor)
         editor.show()
         
@@ -491,11 +604,20 @@ class FileSystemGUI(QMainWindow):
         if item:
             menu = QMenu()
             
+            # 获取目录路径
+            dir_path = self.get_tree_item_path(item)
+            
             new_folder_action = menu.addAction("新建文件夹")
             new_folder_action.triggered.connect(self.create_new_folder)
             
             new_file_action = menu.addAction("新建文件")
             new_file_action.triggered.connect(self.create_new_file)
+            
+            menu.addSeparator()
+            
+            # 属性选项
+            properties_action = menu.addAction("属性")
+            properties_action.triggered.connect(lambda: self.show_properties(dir_path))
             
             menu.addSeparator()
             
@@ -523,6 +645,12 @@ class FileSystemGUI(QMainWindow):
             
             delete_action = menu.addAction("删除")
             delete_action.triggered.connect(self.delete_selected)
+            
+            menu.addSeparator()
+            
+            # 属性选项
+            properties_action = menu.addAction("属性")
+            properties_action.triggered.connect(lambda: self.show_properties(data['name']))
             
             menu.addSeparator()
             
@@ -568,6 +696,42 @@ class FileSystemGUI(QMainWindow):
         # 自动保存
         self.save_filesystem()
         event.accept()
+        
+    def show_properties(self, name):
+        """显示文件或目录的属性对话框"""
+        try:
+            properties, error = self.fs.get_item_properties(name)
+            if error:
+                QMessageBox.warning(self, "错误", f"无法获取属性: {error}")
+                return
+            
+            dialog = PropertiesDialog(properties, self)
+            dialog.exec_()
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"显示属性时发生错误: {str(e)}")
+    
+    def get_tree_item_path(self, item):
+        """获取树形控件项目的完整路径"""
+        # 直接使用存储在UserRole中的路径数据
+        stored_path = item.data(0, Qt.UserRole)
+        if stored_path:
+            return stored_path
+            
+        # 如果没有存储路径数据，则通过遍历父节点构建路径
+        path_parts = []
+        current_item = item
+        
+        while current_item is not None:
+            text = current_item.text(0)
+            # 跳过根目录显示文本"文件系统 (/)"
+            if text and not text.startswith("文件系统"):
+                path_parts.insert(0, text)
+            current_item = current_item.parent()
+        
+        if not path_parts:
+            return "/"
+        else:
+            return "/" + "/".join(path_parts)
 
 
 class RecursiveDeleteDialog(QDialog):

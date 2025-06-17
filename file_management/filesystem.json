@@ -5,18 +5,18 @@
     -2,
     -2,
     -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
-    -2,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
     -1,
     -1,
     -1,
@@ -1007,18 +1007,18 @@
     1,
     1,
     1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
     0,
     0,
     0,
@@ -2006,22 +2006,22 @@
     0
   ],
   "disk_blocks": [
-    "a42141241",
-    "# 工具函数",
-    "# 配置文件",
-    "# 认证模块",
-    "# 数据库模块",
-    "# 字符串工具",
-    "# 日期工具",
-    "# 主程序测试\n23431\n4214\n\n42142\n4\n1242\n1\n\n214\n1\n2424\n1\n42\n412414\n\n\n21\n4\n21\n41\n4\n214\n14\n1\n4\n1\n2\n",
-    "# 工具测试\n#\n#",
-    "# 项目说明",
-    "# API文档",
-    "fake_image_data",
-    "fake_screenshot_data",
-    "{\"debug\": true}",
-    "{\"debug\": false}",
-    "我是一个孤独的文件",
+    "在level1中的文件",
+    "在level2中的文件",
+    "在level3中的文件",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
     "",
     "",
     "",
@@ -3013,189 +3013,67 @@
       "size": 0,
       "start_block": -1,
       "is_directory": true,
-      "creation_time": "2025-06-15T18:59:27.723072",
-      "last_access_time": "2025-06-15T18:59:27.723072",
-      "last_modification_time": "2025-06-15T18:59:27.723072"
+      "creation_time": "2025-06-17T14:43:52.008375",
+      "last_access_time": "2025-06-17T14:43:52.008375",
+      "last_modification_time": "2025-06-17T14:43:52.008375"
     },
     "children": [
       {
         "fcb": {
-          "name": "MyProject",
+          "name": "level1",
           "size": 0,
           "start_block": -1,
           "is_directory": true,
-          "creation_time": "2025-06-15T18:59:27.723072",
-          "last_access_time": "2025-06-15T18:59:27.723072",
-          "last_modification_time": "2025-06-15T18:59:27.723072"
+          "creation_time": "2025-06-17T14:43:52.008375",
+          "last_access_time": "2025-06-17T14:43:52.008375",
+          "last_modification_time": "2025-06-17T14:43:52.008375"
         },
         "children": [
           {
             "fcb": {
-              "name": "src",
+              "name": "level2",
               "size": 0,
               "start_block": -1,
               "is_directory": true,
-              "creation_time": "2025-06-15T18:59:27.723072",
-              "last_access_time": "2025-06-15T18:59:27.723072",
-              "last_modification_time": "2025-06-15T18:59:27.723072"
+              "creation_time": "2025-06-17T14:43:52.008375",
+              "last_access_time": "2025-06-17T14:43:52.008375",
+              "last_modification_time": "2025-06-17T14:43:52.008375"
             },
             "children": [
               {
                 "fcb": {
-                  "name": "main.py",
-                  "size": 9,
-                  "start_block": 0,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T13:19:45.025104",
-                  "last_modification_time": "2025-06-15T19:26:59.164256"
+                  "name": "level3",
+                  "size": 0,
+                  "start_block": -1,
+                  "is_directory": true,
+                  "creation_time": "2025-06-17T14:43:52.008375",
+                  "last_access_time": "2025-06-17T14:43:52.008375",
+                  "last_modification_time": "2025-06-17T14:43:52.008375"
                 },
-                "children": []
+                "children": [
+                  {
+                    "fcb": {
+                      "name": "file_in_level3.txt",
+                      "size": 11,
+                      "start_block": 2,
+                      "is_directory": false,
+                      "creation_time": "2025-06-17T14:43:52.008375",
+                      "last_access_time": "2025-06-17T14:43:52.008375",
+                      "last_modification_time": "2025-06-17T14:43:52.008375"
+                    },
+                    "children": []
+                  }
+                ]
               },
               {
                 "fcb": {
-                  "name": "utils.py",
-                  "size": 6,
+                  "name": "file_in_level2.txt",
+                  "size": 11,
                   "start_block": 1,
                   "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "config.py",
-                  "size": 6,
-                  "start_block": 2,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T13:19:49.501940",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "modules",
-                  "size": 0,
-                  "start_block": -1,
-                  "is_directory": true,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": [
-                  {
-                    "fcb": {
-                      "name": "__init__.py",
-                      "size": 0,
-                      "start_block": -1,
-                      "is_directory": false,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": []
-                  },
-                  {
-                    "fcb": {
-                      "name": "auth.py",
-                      "size": 6,
-                      "start_block": 3,
-                      "is_directory": false,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": []
-                  },
-                  {
-                    "fcb": {
-                      "name": "database.py",
-                      "size": 7,
-                      "start_block": 4,
-                      "is_directory": false,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": []
-                  },
-                  {
-                    "fcb": {
-                      "name": "helpers",
-                      "size": 0,
-                      "start_block": -1,
-                      "is_directory": true,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": [
-                      {
-                        "fcb": {
-                          "name": "string_utils.py",
-                          "size": 7,
-                          "start_block": 5,
-                          "is_directory": false,
-                          "creation_time": "2025-06-15T18:59:27.723072",
-                          "last_access_time": "2025-06-15T18:59:27.723072",
-                          "last_modification_time": "2025-06-15T18:59:27.723072"
-                        },
-                        "children": []
-                      },
-                      {
-                        "fcb": {
-                          "name": "date_utils.py",
-                          "size": 6,
-                          "start_block": 6,
-                          "is_directory": false,
-                          "creation_time": "2025-06-15T18:59:27.723072",
-                          "last_access_time": "2025-06-15T18:59:27.723072",
-                          "last_modification_time": "2025-06-15T18:59:27.723072"
-                        },
-                        "children": []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "fcb": {
-              "name": "tests",
-              "size": 0,
-              "start_block": -1,
-              "is_directory": true,
-              "creation_time": "2025-06-15T18:59:27.723072",
-              "last_access_time": "2025-06-15T18:59:27.723072",
-              "last_modification_time": "2025-06-15T18:59:27.723072"
-            },
-            "children": [
-              {
-                "fcb": {
-                  "name": "test_main.py",
-                  "size": 89,
-                  "start_block": 7,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T19:01:55.625201",
-                  "last_modification_time": "2025-06-15T19:02:05.929112"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "test_utils.py",
-                  "size": 10,
-                  "start_block": 8,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T19:10:45.775799",
-                  "last_modification_time": "2025-06-15T19:10:54.386764"
+                  "creation_time": "2025-06-17T14:43:52.008375",
+                  "last_access_time": "2025-06-17T14:43:52.008375",
+                  "last_modification_time": "2025-06-17T14:43:52.008375"
                 },
                 "children": []
               }
@@ -3203,232 +3081,23 @@
           },
           {
             "fcb": {
-              "name": "docs",
-              "size": 0,
-              "start_block": -1,
-              "is_directory": true,
-              "creation_time": "2025-06-15T18:59:27.723072",
-              "last_access_time": "2025-06-15T18:59:27.723072",
-              "last_modification_time": "2025-06-15T18:59:27.723072"
-            },
-            "children": [
-              {
-                "fcb": {
-                  "name": "README.md",
-                  "size": 6,
-                  "start_block": 9,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T14:02:09.653372",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "API.md",
-                  "size": 7,
-                  "start_block": 10,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-17T14:02:07.871617",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "images",
-                  "size": 0,
-                  "start_block": -1,
-                  "is_directory": true,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": [
-                  {
-                    "fcb": {
-                      "name": "logo.png",
-                      "size": 15,
-                      "start_block": 11,
-                      "is_directory": false,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": []
-                  },
-                  {
-                    "fcb": {
-                      "name": "screenshot.png",
-                      "size": 20,
-                      "start_block": 12,
-                      "is_directory": false,
-                      "creation_time": "2025-06-15T18:59:27.723072",
-                      "last_access_time": "2025-06-15T18:59:27.723072",
-                      "last_modification_time": "2025-06-15T18:59:27.723072"
-                    },
-                    "children": []
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "fcb": {
-              "name": "config",
-              "size": 0,
-              "start_block": -1,
-              "is_directory": true,
-              "creation_time": "2025-06-15T18:59:27.723072",
-              "last_access_time": "2025-06-15T18:59:27.723072",
-              "last_modification_time": "2025-06-15T18:59:27.723072"
-            },
-            "children": [
-              {
-                "fcb": {
-                  "name": "development.json",
-                  "size": 15,
-                  "start_block": 13,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              },
-              {
-                "fcb": {
-                  "name": "production.json",
-                  "size": 16,
-                  "start_block": 14,
-                  "is_directory": false,
-                  "creation_time": "2025-06-15T18:59:27.723072",
-                  "last_access_time": "2025-06-15T18:59:27.723072",
-                  "last_modification_time": "2025-06-15T18:59:27.723072"
-                },
-                "children": []
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "fcb": {
-          "name": "tmp",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:09:48.470494",
-          "last_access_time": "2025-06-15T19:09:48.470494",
-          "last_modification_time": "2025-06-15T19:09:48.470494"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": "usr",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:09:52.657819",
-          "last_access_time": "2025-06-15T19:09:52.657819",
-          "last_modification_time": "2025-06-15T19:09:52.657819"
-        },
-        "children": [
-          {
-            "fcb": {
-              "name": ".rc",
-              "size": 0,
-              "start_block": -1,
+              "name": "file_in_level1.txt",
+              "size": 11,
+              "start_block": 0,
               "is_directory": false,
-              "creation_time": "2025-06-15T19:16:33.592248",
-              "last_access_time": "2025-06-15T19:16:33.592248",
-              "last_modification_time": "2025-06-15T19:16:33.592248"
+              "creation_time": "2025-06-17T14:43:52.008375",
+              "last_access_time": "2025-06-17T14:56:56.486397",
+              "last_modification_time": "2025-06-17T14:43:52.008375"
             },
             "children": []
           }
         ]
-      },
-      {
-        "fcb": {
-          "name": "swap",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:09:57.473570",
-          "last_access_time": "2025-06-15T19:09:57.473570",
-          "last_modification_time": "2025-06-15T19:09:57.473570"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": "photo",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:10:10.552486",
-          "last_access_time": "2025-06-15T19:10:10.552486",
-          "last_modification_time": "2025-06-15T19:10:10.552486"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": "video",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:10:24.781836",
-          "last_access_time": "2025-06-15T19:10:24.781836",
-          "last_modification_time": "2025-06-15T19:10:24.781836"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": "test",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:10:30.496809",
-          "last_access_time": "2025-06-15T19:10:30.496809",
-          "last_modification_time": "2025-06-15T19:10:30.496809"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": "dev",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:10:33.390588",
-          "last_access_time": "2025-06-15T19:10:33.390588",
-          "last_modification_time": "2025-06-15T19:10:33.390588"
-        },
-        "children": []
-      },
-      {
-        "fcb": {
-          "name": ".git",
-          "size": 0,
-          "start_block": -1,
-          "is_directory": true,
-          "creation_time": "2025-06-15T19:10:38.045811",
-          "last_access_time": "2025-06-15T19:10:38.045811",
-          "last_modification_time": "2025-06-15T19:10:38.045811"
-        },
-        "children": []
       }
     ]
   },
   "current_path": [
     "/",
-    "MyProject",
-    "docs"
+    "level1"
   ],
-  "next_file_id": 13
+  "next_file_id": 16
 }

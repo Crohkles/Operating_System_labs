@@ -406,8 +406,7 @@ class FileSystem:
             for block in blocks:
                 self.bitmap.free_block(block)
             self.fat.free_blocks(node.fcb.start_block)
-        
-        # 分配新块
+          # 分配新块
         if content:
             start_block = self.fat.allocate_blocks(len(content), self.block_size)
             if start_block is None:
@@ -421,7 +420,7 @@ class FileSystem:
             node.fcb.start_block = start_block
         else:
             node.fcb.start_block = -1
-        
+            
         node.fcb.size = len(content)
         node.fcb.last_modification_time = datetime.now()
         file_info['position'] = len(content)
@@ -431,12 +430,12 @@ class FileSystem:
     def _write_to_blocks(self, start_block, content):
         """将内容写入磁盘块"""
         blocks = self.fat.get_file_blocks(start_block)
-        content_bytes = content.encode('utf-8')
         
+        # 直接按字符分割，避免UTF-8编码问题
         for i, block_num in enumerate(blocks):
             start_pos = i * self.block_size
-            end_pos = min(start_pos + self.block_size, len(content_bytes))
-            block_content = content_bytes[start_pos:end_pos].decode('utf-8')
+            end_pos = min(start_pos + self.block_size, len(content))
+            block_content = content[start_pos:end_pos]
             self.disk.blocks[block_num] = block_content
     
     def _read_from_blocks(self, start_block, file_size):
@@ -938,3 +937,103 @@ class FileSystem:
             return True, f"目录 '{name}' 及其内容递归删除成功: {msg}"
         else:
             return False, f"递归删除失败: {msg}"
+    
+    def get_item_properties(self, name):
+        """获取文件或目录的详细属性信息"""
+        # 检查是否包含路径分隔符，如果有则使用路径解析
+        if "/" in name:
+            target_node, success, msg = self._resolve_path(name)
+            if not success:
+                return None, msg
+            target_path = name
+        else:
+            target_node = self.current_dir.find_child(name)
+            if not target_node:
+                return None, f"'{name}' 不存在"
+            target_path = name
+        
+        fcb = target_node.fcb
+        
+        # 基本属性
+        properties = {
+            'name': fcb.name,
+            'path': self._get_full_path(target_node),
+            'type': "目录" if fcb.is_directory else "文件",
+            'size': fcb.size,
+            'size_formatted': self._format_size(fcb.size),
+            'creation_time': fcb.creation_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_access_time': fcb.last_access_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'last_modification_time': fcb.last_modification_time.strftime("%Y-%m-%d %H:%M:%S"),
+            'start_block': fcb.start_block
+        }
+        
+        if fcb.is_directory:
+            # 目录特有属性
+            file_count = 0
+            dir_count = 0
+            total_size = 0
+            
+            for child in target_node.children:
+                if child.fcb.is_directory:
+                    dir_count += 1
+                else:
+                    file_count += 1
+                    total_size += child.fcb.size
+            
+            properties.update({
+                'file_count': file_count,
+                'dir_count': dir_count,
+                'total_items': file_count + dir_count,
+                'total_content_size': total_size,
+                'total_content_size_formatted': self._format_size(total_size)
+            })
+        else:
+            # 文件特有属性
+            if fcb.start_block != -1:
+                blocks = self.fat.get_file_blocks(fcb.start_block)
+                properties.update({
+                    'blocks_used': len(blocks),
+                    'block_list': blocks,
+                    'allocated_size': len(blocks) * self.block_size,
+                    'allocated_size_formatted': self._format_size(len(blocks) * self.block_size)
+                })
+            else:
+                properties.update({
+                    'blocks_used': 0,
+                    'block_list': [],
+                    'allocated_size': 0,
+                    'allocated_size_formatted': '0 B'
+                })
+        
+        return properties, None
+    
+    def _get_full_path(self, node):
+        """获取节点的完整路径"""
+        path_parts = []
+        current = node
+        while current and current != self.root:
+            path_parts.insert(0, current.fcb.name)
+            current = current.parent
+        
+        if not path_parts:
+            return "/"
+        else:
+            return "/" + "/".join(path_parts)
+    
+    def _format_size(self, size_bytes):
+        """格式化大小显示"""
+        if size_bytes == 0:
+            return "0 B"
+        
+        size_names = ["B", "KB", "MB", "GB"]
+        size = float(size_bytes)
+        i = 0
+        
+        while size >= 1024.0 and i < len(size_names) - 1:
+            size /= 1024.0
+            i += 1
+        
+        if i == 0:
+            return f"{int(size)} {size_names[i]}"
+        else:
+            return f"{size:.1f} {size_names[i]}"
